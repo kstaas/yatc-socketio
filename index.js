@@ -9,6 +9,13 @@ app.get('/', function(req, res) {
 
 io.on('connection', function(socket) {
   socket.on('chat message', function(name, msg) {
+    if (socket.name == undefined) {
+      socket.name = name;
+    }
+    if (socket.name != name) {
+      io.emit('chat message', `${socket.name}: changed name to ${name}`)
+      socket.name = name;
+    }
     io.emit('chat message', `${name}: ${msg}`);
   });
 });
