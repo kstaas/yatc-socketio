@@ -367,6 +367,61 @@ app.get('/state', function (req,res) {
   res.send(JSON.stringify(game.state, null, 3));
 });
 
+app.get('/roll', function (req,res) {
+  // Protect against the client cheating and trying to roll more than 3 times.
+  if (game.state.rolls < 3) {
+    var dieString = q.search.substring(1);
+    var die = JSON.parse(dieString.replace(/%22/g, '"'));
+    game.state.rolls++;
+    for (var i = 0; i < 5; ++i) {
+        if (die[i].roll) {
+            game.state.die[i].value = Roll();
+        }
+    }
+    res.send(JSON.stringify(game.state, null, 3));
+  } else {
+    next(400);
+  }
+});
+
+app.get('/score', function (req,res) {
+  var scoreString = q.search.substring(1);
+  var category = JSON.parse(scoreString.replace(/%22/g, '"'));
+  // console.log('score=' + category);
+  var ok = Score(category);
+  if (ok) {
+    // Now, do game maintenance.
+    game.state.die = [
+        new Dice(),
+        new Dice(),
+        new Dice(),
+        new Dice(),
+        new Dice()
+    ];
+    game.state.rolls = 0;
+    game.state.player++;
+    if (game.state.player >= game.players.length) {
+        game.state.player = 0;
+        game.state.rounds++;
+        if (game.state.rounds >= 13) {
+            ; // Game is over.
+        }
+    }
+    res.send(JSON.stringify(game, null, 3));
+  } else {
+    next(400);
+  }
+});
+
+app.get('/refresh', function (req,res) {
+  res.send(JSON.stringify(game, null, 3));
+});
+
+app.get('/restart', function (req,res) {
+  game = new Game();
+  res.send(JSON.stringify(game, null, 3));
+});
+
 /*
 var url = require('url');
 var fs = require('fs');
