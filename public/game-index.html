@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+	<head>
+        <!--
+        Avoids this message in IE 11's "Developer Tools" console:
+            The attached page targets document mode 7. Some console APIs and features may not be available.
+        and allows the page to display correctly.
+        -->
+        <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+        <link rel='stylesheet' href='styles.css'>
+	</head>
+
+	<body onload='initialize();'>
+        <table id='theBoard'></table>
+        <p>
+        <!--
+        <button type='button' id='die1'/>
+        <button type='button' id='die2'/>
+        <button type='button' id='die3'/>
+        <button type='button' id='die4'/>
+        <button type='button' id='die5'/>
+        <img id='die1'/>
+        <img id='die2'/>
+        <img id='die3'/>
+        <img id='die4'/>
+        <img id='die5'/>
+        -->
+        <div id='dice'></div>
+        <p>
+        <input type='button' id='selector' value='' disabled onclick="onSelector()">
+        <input type='button' id='refresh'  value='Refresh'   onclick="onRefresh()">
+        <p>
+        <input type='text' id='message'>
+        <input type='text' id='messages'>
+
+		<script src="client.js"></script>
+	</body>
+</html>

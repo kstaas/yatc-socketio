@@ -1,0 +1,67 @@
+<style type='text/css'>
+    table {
+    }
+
+    table, th, td {
+        border: 1px solid black;
+        border-collapse: collapse;
+        font-size: 11pt;
+        font-family: "Arial, Helvetica, sans-serif";
+    }
+
+    th, td {
+        padding-left:   6px;
+        padding-right:  6px;
+        padding-top:    6px;
+        padding-bottom: 6px;
+    }
+
+
+    th.player {
+        color: white;
+        background-color: #4CA5F0;
+    }
+
+    td.score_roll {
+        color: black;
+        background-color: white;
+    }
+
+    td.score_idle {
+        color: black;
+        background-color: lightgray;
+    }
+
+    td.category {
+        color: white;
+        background-color: #4CAF50;
+    }
+
+    td.bonus {
+        color: white;
+        background-color: #66aaaa;
+    }
+
+    th.turn, td.total {
+        color: white;
+        background-color: #448888;
+    }
+
+    th.category, td.category {
+        width: 100px;
+    }
+
+    th.player, td.player {
+        width: 65px;
+    }
+
+    die_keep {
+        background-color: '';
+    }
+
+    die_roll {
+        background-color: '';
+    }
+
+    <!-- a { text-decoration:none } //-->
+</style>
