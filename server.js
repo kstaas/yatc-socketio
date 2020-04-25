@@ -8,9 +8,7 @@ var port = process.env.PORT || 3000;
 var cindex = 0;
 var colors = [ 'red', 'blue', 'green', 'orange', 'cyan', 'pink', 'purple' ];
 
-app.get('/', function(req, res) {
-  res.sendFile(__dirname + '/index.html');
-});
+app.use(express.static('public'));
 
 io.on('connection', function(socket) {
   socket.on('chat message', function(name, msg) {
