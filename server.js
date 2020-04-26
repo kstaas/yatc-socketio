@@ -36,6 +36,7 @@ io.on('connection', function(socket) {
         // Add a player with this name.
         game.players.push(new Player(name));
         // TODO Force a refresh of the client's board.
+        io.emit('refresh');
       }
       // If this name is different than the name that associated with this socket then announce that fact.
       if (socket.name != name) {
@@ -47,6 +48,7 @@ io.on('connection', function(socket) {
           {
             game.players[i].name = name;
             // TODO Force a refresh of the client's board.
+            io.emit('refresh');
             break;
           }
         }
