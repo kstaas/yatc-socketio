@@ -6,6 +6,7 @@
 var express = require('express');
 var app = express();
 var http = require('http').Server(app);
+var url = require('url');
 var io = require('socket.io')(http);
 var port = process.env.PORT || 3000;
 
@@ -376,6 +377,7 @@ app.get('/players', function (req,res) {
 
 app.get('/roll', function (req,res) {
   // Protect against the client cheating and trying to roll more than 3 times.
+  var q = url.parse(req.url, true);
   if (game.state.rolls < 3) {
     var dieString = q.search.substring(1);
     var die = JSON.parse(dieString.replace(/%22/g, '"'));
