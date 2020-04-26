@@ -35,7 +35,7 @@ io.on('connection', function(socket) {
         cindex = (cindex + 1) % colors.length;
         // Add a player with this name.
         game.players.push(new Player(name));
-        // TODO Force a refresh of the client's board.
+        // Force a refresh of the client's board.
         io.emit('refresh');
       }
       // If this name is different than the name that associated with this socket then announce that fact.
@@ -47,7 +47,7 @@ io.on('connection', function(socket) {
           if (game.players[i].name == socket.name)
           {
             game.players[i].name = name;
-            // TODO Force a refresh of the client's board.
+            // Force a refresh of the client's board.
             io.emit('refresh');
             break;
           }
@@ -396,6 +396,7 @@ app.get('/roll', function (req,res) {
 });
 
 app.get('/score', function (req,res) {
+  var q = url.parse(req.url, true);
   var scoreString = q.search.substring(1);
   var category = JSON.parse(scoreString.replace(/%22/g, '"'));
   // console.log('score=' + category);
@@ -419,6 +420,7 @@ app.get('/score', function (req,res) {
         }
     }
     res.send(JSON.stringify(game, null, 3));
+    io.emit('refresh');
   } else {
     next(400);
   }
