@@ -360,6 +360,16 @@ function Category(id) {
     this.calculate = function(dice) {
         return 0;
     }
+
+    // TODO call rest in constructor.
+    this.reset = function() {
+      this.score = 0;
+      if (this.id == 6 || this.id == 7 || this.id >= 15) {
+        this.taken = true;
+      } else {
+        this.taken = true;
+      }
+    }
 }
 
 ////
@@ -409,6 +419,13 @@ function Player(name) {
         this.categories[15].score = 0; // TODO yatc bonus
         this.categories[16].score = this.categories[15].score + bottotal;
         this.categories[17].score = this.categories[7].score + this.categories[16].score;
+    }
+
+    this.reset = function() {
+      this.state = new State();
+      for (var i = 0; i < 18; ++i) {
+        this.categories[i].reset();
+      }
     }
 }
 
@@ -474,7 +491,7 @@ app.get('/roll', function (req,res) {
   var player = findPlayer(name);
   var dieString = GetURLParameter(q.search, 'die', '');
   var die = JSON.parse(dieString.replace(/%22/g, '"'));
-  console.log(`name=${name} die=${dieString}`);
+  // console.log(`name=${name} die=${dieString}`);
   if (player.state.rolls < 3) {
     player.state.rolls++;
     for (var i = 0; i < 5; ++i) {
@@ -494,7 +511,7 @@ app.get('/score', function (req,res) {
   var player = findPlayer(name);
   var scoreString = GetURLParameter(q.search, 'id', '');
   var category = JSON.parse(scoreString.replace(/%22/g, '"'));
-  console.log(`name=${name} score=${category}`);
+  // console.log(`name=${name} score=${category}`);
   var ok = Score(player, category);
   if (ok) {
     // Now, do game maintenance.
@@ -522,147 +539,9 @@ app.get('/refresh', function (req,res) {
 });
 
 app.get('/restart', function (req,res) {
-  game = new Game();
+  var q = url.parse(req.url, true);
+  var name = GetURLParameter(q.search, 'name', '');
+  var player = findPlayer(name);
+  player.reset();
   res.send(JSON.stringify(game, null, 3));
 });
-
-/*
-var url = require('url');
-var fs = require('fs');
-var http = require('http');
-var PORT = 4567; 
-function serveFile(filename, type, response) {
-    fs.readFile(filename, function(error, content) {
-            if (error) {
-                response.writeHead(500);
-                response.end();
-            } else {
-                response.writeHead(200, {'Content-Type': type});
-                response.end(content, 'utf-8');
-            }
-        });
-}
-
-function handleRequest(request, response) {
-    try {
-        // console.log(request.url);
-        var q = url.parse(request.url, true);
-
-        if (q.pathname == '/') {
-            serveFile('./index.html', 'text/html', response);
-
-        } else if (q.pathname == '/favicon.ico') {
-            serveFile('./favicon.ico', 'image/x-icon', response);
-
-        } else if (q.pathname == '/client.js') {
-            serveFile('./client.js', 'text/javascript', response);
-
-        } else if (q.pathname == '/styles.css') {
-            serveFile('./styles.css', 'text/css', response);
-
-        } else if (q.pathname == '/0.png'
-                || q.pathname == '/1.png' || q.pathname == '/2.png' || q.pathname == '/3.png' || q.pathname == '/4.png' || q.pathname == '/5.png' || q.pathname == '/6.png'
-                || q.pathname == '/1k.png' || q.pathname == '/2k.png' || q.pathname == '/3k.png' || q.pathname == '/4k.png' || q.pathname == '/5k.png' || q.pathname == '/6k.png') {
-            serveFile(q.pathname.substring(1), 'image/png', response);
-
-        } else if (q.pathname == '/catnames') {
-            response.writeHead(200, {'Content-Type': 'application/json'});
-            var catString = JSON.stringify(catNames, null, 3);
-            response.end(catString);
-
-        } else if (q.pathname == '/catclasses') {
-            response.writeHead(200, {'Content-Type': 'application/json'});
-            var catString = JSON.stringify(catClasses, null, 3);
-            response.end(catString);
-
-        } else if (q.pathname == '/players') {
-            response.writeHead(200, {'Content-Type': 'application/json'});
-            var playersString = JSON.stringify(game.players, null, 3);
-            response.end(playersString);
-
-        } else if (q.pathname == '/state') {
-            response.writeHead(200, {'Content-Type': 'application/json'});
-            var stateString = JSON.stringify(game.state, null, 3);
-            response.end(stateString);
-
-        } else if (q.pathname == '/message') {
-            var message = q.search.substring(1);
-            response.writeHead(200, {'Content-Type': 'application/json'});
-            response.end(message);
-
-        } else if (q.pathname == '/roll') {
-            // Protect against the client cheating and trying to roll more than 3 times.
-            if (game.state.rolls < 3) {
-                var dieString = q.search.substring(1);
-                var die = JSON.parse(dieString.replace(/%22/g, '"'));
-                game.state.rolls++;
-                for (var i = 0; i < 5; ++i) {
-                    if (die[i].roll) {
-                        game.state.die[i].value = Roll();
-                    }
-                }
-                var stateString = JSON.stringify(game.state, null, 3);
-                response.writeHead(200, {'Content-Type': 'application/json'});
-                response.end(stateString);
-            } else {
-                response.writeHead(400);
-                response.end();
-            }
-
-        } else if(q.pathname == '/score') {
-            var scoreString = q.search.substring(1);
-            var category = JSON.parse(scoreString.replace(/%22/g, '"'));
-            // console.log('score=' + category);
-            var ok = Score(category);
-            if (ok) {
-                // Now, do game maintenance.
-                game.state.die = [
-                    new Dice(),
-                    new Dice(),
-                    new Dice(),
-                    new Dice(),
-                    new Dice()
-                ];
-                game.state.rolls = 0;
-                game.state.player++;
-                if (game.state.player >= game.players.length) {
-                    game.state.player = 0;
-                    game.state.rounds++;
-                    if (game.state.rounds >= 13) {
-                        ; // Game is over.
-                    }
-                }
-                var gameString = JSON.stringify(game, null, 3);
-                response.writeHead(200, {'Content-Type': 'application/json'});
-                response.end(gameString);
-            } else {
-                response.writeHead(400);
-                response.end();
-            }
-
-        } else if(q.pathname == '/refresh') {
-            var gameString = JSON.stringify(game, null, 3);
-            response.writeHead(200, {'Content-Type': 'application/json'});
-            response.end(gameString);
-
-        } else if(q.pathname == '/restart') {
-            game = new Game();
-            var gameString = JSON.stringify(game, null, 3);
-            response.writeHead(200, {'Content-Type': 'application/json'});
-            response.end(gameString);
-
-        } else {
-            response.writeHead(500);
-            response.end();
-        }
-    } catch(err) {
-        console.error(err);
-    }
-}
-
-var server = http.createServer(handleRequest);
-
-server.listen(PORT, function() {
-    // console.log('Server listening on http://localhost:%s', PORT);
-    });
-*/

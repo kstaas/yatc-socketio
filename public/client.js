@@ -152,7 +152,8 @@ function onRollRestart() {
     // console.log('onRollRestart()');
     var rollRestart = document.getElementById('rollrestart');
     if (rollRestart.value == 'Restart') {
-        httpGetAsync('/restart',
+        var name = $('#n').val();
+        httpGetAsync(`/restart?name=${name}`,
                 function(response) {
                     var game = JSON.parse(response); // Server returns whole game on 'score'.
                     players = game.players;
