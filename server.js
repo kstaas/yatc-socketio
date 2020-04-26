@@ -24,39 +24,89 @@ http.listen(port, function() {
 var cindex = 0;
 var colors = [ 'red', 'blue', 'green', 'orange', 'cyan', 'pink', 'purple' ];
 
+function isNameUnique(name)
+{
+  var unique = true;
+  for (var i = 0; i < game.players.length; ++i)
+  {
+    if (game.players[i].name == name)
+    {
+      return false;
+    }
+  }
+  return true;
+}
+
 io.on('connection', function(socket) {
   socket.on('chat message', function(name, msg) {
-    // Unless there is a name, do nothing!
-    if (name.length) {
-      // If there's no name associated with this socket yet, then associate this name.
-      if (socket.name == undefined) {
-        socket.name = name;
-        socket.color = colors[cindex];
-        cindex = (cindex + 1) % colors.length;
-        // Add a player with this name.
-        game.players.push(new Player(name));
-        // Force a refresh of the client's board.
-        io.emit('refresh');
-      }
-      // If this name is different than the name that associated with this socket then announce that fact.
-      if (socket.name != name) {
-        io.emit('chat message', 'black', socket.name, `changed name to ${name}`)
-        // Change the player with this name.
-        for (var i = 0; i < game.players.length; ++i)
+    if (name.length)
+    {
+      // Only do something if a name was specified.
+
+      if (!isNameUnique(name))
+      {
+        // The specified name was not unique.
+
+        if (socket.name == undefined)
         {
-          if (game.players[i].name == socket.name)
-          {
-            game.players[i].name = name;
-            // Force a refresh of the client's board.
-            io.emit('refresh');
-            break;
+          // A new player tried to use a name that was already in use.
+          io.emit('chat message', 'black', 'system', `failed to add player with name ${name}`);
+          socket.emit('name failed'); // This will 'clear' the name from the name field at the client.
+          if (msg.length) {
+            io.emit('chat message', 'black', 'system', msg);
           }
         }
-        socket.name = name;
+        else
+        {
+          // An existing player tried to rename to a name that was already in use.
+          io.emit('chat message', socket.color, socket.name, `failed to change name to ${name}`);
+        }
       }
-      // Only emit messages, not blanks.
-      if (msg.length) {
-        io.emit('chat message', socket.color, socket.name, msg);
+      else
+      {
+        // The specified name was unique.
+
+        if (socket.name == undefined)
+        {
+          // This is a new player.
+
+          // This is a new player so create them in the game context.
+          socket.name = name;
+          socket.color = colors[cindex];
+          cindex = (cindex + 1) % colors.length;
+          io.emit('chat message', socket.color, socket.name, 'joined the game');
+
+          // Add the player in the context of the game.
+          game.players.push(new Player(socket.name));
+          // Force a refresh of the client's board.
+          io.emit('refresh');
+        }
+
+        if (socket.name != name)
+        {
+          // This is an existing player changing their name.
+
+          // Change the players name in the context of the game.
+          for (var i = 0; i < game.players.length; ++i)
+          {
+            if (game.players[i].name == socket.name)
+            {
+              game.players[i].name = name;
+              // Force a refresh of the all of the client boards.
+              io.emit('refresh');
+              break;
+            }
+          }
+
+          // Announce in chat the name change.
+          io.emit('chat message', 'black', socket.name, `changed name to ${name}`)
+          socket.name = name;
+        }
+
+        // Handle any msg, whether its a new player or an existing player.
+        if (msg.length) {
+          io.emit('chat message', socket.color, socket.name, msg);
+        }
       }
     }
   });

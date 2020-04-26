@@ -11,6 +11,9 @@ $(function () {
     $('#messages').append($(`<li style="color:${color}">`).text(`${name}: ${msg}`));
     window.scrollTo(0, document.body.scrollHeight);
   });
+  socket.on('name failed', function() {
+    $('#n').val('');
+  });
   socket.on('refresh', function() {
     onRefresh();
   });
@@ -110,7 +113,10 @@ function drawDie() {
 
 function drawRollRestart() {
     var rollRestart = document.getElementById('rollrestart');
-    if (state.rounds >= 13) {
+    if ($('#n').val() == '') {
+        rollRestart.disabled = true;
+        rollRestart.value = 'Roll';
+    } else if (state.rounds >= 13) {
         rollRestart.disabled = false;
         rollRestart.value = 'Restart';
     } else if (state.rolls >= 3) {
