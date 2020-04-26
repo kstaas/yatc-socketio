@@ -500,8 +500,6 @@ app.get('/roll', function (req,res) {
         }
     }
     res.send(JSON.stringify(player.state, null, 3));
-  } else {
-    next(400);
   }
 });
 
@@ -529,8 +527,6 @@ app.get('/score', function (req,res) {
     }
     res.send(JSON.stringify(game, null, 3));
     io.emit('refresh');
-  } else {
-    next(400);
   }
 });
 
