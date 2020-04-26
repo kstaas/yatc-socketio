@@ -463,10 +463,12 @@ app.get('/players', function (req,res) {
 
 app.get('/roll', function (req,res) {
   // Protect against the client cheating and trying to roll more than 3 times.
-  var q = url.parse(req.url, true);
   if (game.state.rolls < 3) {
-    var dieString = q.search.substring(1);
+    var q = url.parse(req.url, true);
+    var name = GetURLParameter(q.search, 'name', '');
+    var dieString = GetURLParameter(q.search, 'die', '');
     var die = JSON.parse(dieString.replace(/%22/g, '"'));
+    console.log(`name=${name} die=${dieString}`);
     game.state.rolls++;
     for (var i = 0; i < 5; ++i) {
         if (die[i].roll) {

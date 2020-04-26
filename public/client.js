@@ -163,8 +163,9 @@ function onRollRestart() {
                     console.error('onRollRestart() GET /restart status=' + error);
                 });
     } else {
+        var name = $('#n').val();
         var dieString = JSON.stringify(state.die);
-        httpGetAsync('/roll?' + dieString,
+        httpGetAsync(`/roll?name=${name}&die=${dieString}`,
                 function(response) {
                     // console.log('onRollRestart() response=' + response);
                     // Save old die 'roll' states..
