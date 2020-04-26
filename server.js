@@ -43,7 +43,14 @@ io.on('connection', function(socket) {
     {
       // Only do something if a name was specified.
 
-      if (!isNameUnique(name))
+      if (socket.name == name)
+      {
+        // This is an existing user so emit their message if there is one.
+        if (msg.length) {
+          io.emit('chat message', socket.color, socket.name, msg);
+        }
+      }
+      else if (!isNameUnique(name))
       {
         // The specified name was not unique.
 
@@ -70,7 +77,7 @@ io.on('connection', function(socket) {
         {
           // This is a new player.
 
-          // This is a new player so create them in the game context.
+          // This is a new player so create them in the game context.  socket.name = name;
           socket.name = name;
           socket.color = colors[cindex];
           cindex = (cindex + 1) % colors.length;
@@ -81,7 +88,7 @@ io.on('connection', function(socket) {
           // Force a refresh of the client's board.
           io.emit('refresh');
         }
-
+        else
         if (socket.name != name)
         {
           // This is an existing player changing their name.
