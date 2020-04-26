@@ -90,17 +90,17 @@ function drawDie() {
     document.getElementById('dice').innerHTML = dice;
 }
 
-function drawRollScore() {
-    var rollscore = document.getElementById('rollscore');
+function drawRollRestart() {
+    var rollRestart = document.getElementById('rollrestart');
     if (state.rounds >= 13) {
-        rollscore.disabled = false;
-        rollscore.value = 'Restart';
+        rollRestart.disabled = false;
+        rollRestart.value = 'Restart';
     } else if (state.rolls >= 3) {
-        rollscore.disabled = true;
-        rollscore.value = 'Roll';
+        rollRestart.disabled = true;
+        rollRestart.value = 'Roll';
     } else {
-        rollscore.disabled = false;
-        rollscore.value = 'Roll';
+        rollRestart.disabled = false;
+        rollRestart.value = 'Roll';
     }
 }
 
@@ -124,10 +124,10 @@ function onCategory(cat=-1) {
     }
 }
 
-function onRollScore() {
-    // console.log('onRollScore()');
-    var rollscore = document.getElementById('rollscore');
-    if (rollscore.value == 'Restart') {
+function onRollRestart() {
+    // console.log('onRollRestart()');
+    var rollRestart = document.getElementById('rollrestart');
+    if (rollRestart.value == 'Restart') {
         httpGetAsync('/restart',
                 function(response) {
                     var game = JSON.parse(response); // Server returns whole game on 'score'.
@@ -136,13 +136,13 @@ function onRollScore() {
                     drawBoard();
                 },
                 function(error) {
-                    console.error('onRollScore() GET /restart status=' + error);
+                    console.error('onRollRestart() GET /restart status=' + error);
                 });
     } else {
         var dieString = JSON.stringify(state.die);
         httpGetAsync('/roll?' + dieString,
                 function(response) {
-                    // console.log('onRollScore() response=' + response);
+                    // console.log('onRollRestart() response=' + response);
                     // Save old die 'roll' states..
                     var i;
                     var rolls = [ false, false, false, false, false ];
@@ -155,10 +155,10 @@ function onRollScore() {
                         state.die[i].roll = rolls[i];
                     }
                     drawDie();
-                    drawRollScore();
+                    drawRollRestart();
                 },
                 function(error) {
-                    console.error('onRollScore() GET /roll status=' + error);
+                    console.error('onRollRestart() GET /roll status=' + error);
                 });
     }
 }
@@ -189,7 +189,7 @@ function onRefresh()
                 drawBoard();
             },
             function(error) {
-                console.error('onRollScore() GET /refresh status=' + error);
+                console.error('onRollRestart() GET /refresh status=' + error);
             });
 }
 
@@ -246,5 +246,5 @@ function drawBoard() {
     document.getElementById('board').innerHTML = table;
 
     drawDie();
-    drawRollScore();
+    drawRollRestart();
 }
