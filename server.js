@@ -32,10 +32,23 @@ io.on('connection', function(socket) {
         socket.name = name;
         socket.color = colors[cindex];
         cindex = (cindex + 1) % colors.length;
+        // Add a player with this name.
+        game.players.push(new Player(name));
+        // TODO Force a refresh of the client's board.
       }
       // If this name is different than the name that associated with this socket then announce that fact.
       if (socket.name != name) {
         io.emit('chat message', 'black', socket.name, `changed name to ${name}`)
+        // Change the player with this name.
+        for (var i = 0; i < game.players.length; ++i)
+        {
+          if (game.players[i].name == socket.name)
+          {
+            game.players[i].name = name;
+            // TODO Force a refresh of the client's board.
+            break;
+          }
+        }
         socket.name = name;
       }
       // Only emit messages, not blanks.
@@ -338,12 +351,7 @@ function State() {
 ////    require('./game.js');
 ////
 function Game() {
-    this.players = [
-        new Player('Karl'),
-        new Player('Cheryl'),
-        new Player('Rachel'),
-        new Player('Jake'),
-        ];
+    this.players = [];
     this.state = new State();
 }
 
