@@ -90,17 +90,17 @@ function drawDie() {
     document.getElementById('dice').innerHTML = dice;
 }
 
-function drawSelector() {
-    var selector = document.getElementById('selector');
+function drawRollScore() {
+    var rollscore = document.getElementById('rollscore');
     if (state.rounds >= 13) {
-        selector.disabled = false;
-        selector.value = 'Restart';
+        rollscore.disabled = false;
+        rollscore.value = 'Restart';
     } else if (state.rolls >= 3) {
-        selector.disabled = true;
-        selector.value = 'Roll';
+        rollscore.disabled = true;
+        rollscore.value = 'Roll';
     } else {
-        selector.disabled = false;
-        selector.value = 'Roll';
+        rollscore.disabled = false;
+        rollscore.value = 'Roll';
     }
 }
 
@@ -124,10 +124,10 @@ function onCategory(cat=-1) {
     }
 }
 
-function onSelector() {
-    // console.log('onSelector()');
-    var selector = document.getElementById('selector');
-    if (selector.value == 'Restart') {
+function onRollScore() {
+    // console.log('onRollScore()');
+    var rollscore = document.getElementById('rollscore');
+    if (rollscore.value == 'Restart') {
         httpGetAsync('/restart',
                 function(response) {
                     var game = JSON.parse(response); // Server returns whole game on 'score'.
@@ -136,13 +136,13 @@ function onSelector() {
                     drawBoard();
                 },
                 function(error) {
-                    console.error('onSelector() GET /restart status=' + error);
+                    console.error('onRollScore() GET /restart status=' + error);
                 });
     } else {
         var dieString = JSON.stringify(state.die);
         httpGetAsync('/roll?' + dieString,
                 function(response) {
-                    // console.log('onSelector() response=' + response);
+                    // console.log('onRollScore() response=' + response);
                     // Save old die 'roll' states..
                     var i;
                     var rolls = [ false, false, false, false, false ];
@@ -155,10 +155,10 @@ function onSelector() {
                         state.die[i].roll = rolls[i];
                     }
                     drawDie();
-                    drawSelector();
+                    drawRollScore();
                 },
                 function(error) {
-                    console.error('onSelector() GET /roll status=' + error);
+                    console.error('onRollScore() GET /roll status=' + error);
                 });
     }
 }
@@ -189,7 +189,7 @@ function onRefresh()
                 drawBoard();
             },
             function(error) {
-                console.error('onSelector() GET /refresh status=' + error);
+                console.error('onRollScore() GET /refresh status=' + error);
             });
 }
 
@@ -246,5 +246,5 @@ function drawBoard() {
     document.getElementById('board').innerHTML = table;
 
     drawDie();
-    drawSelector();
+    drawRollScore();
 }

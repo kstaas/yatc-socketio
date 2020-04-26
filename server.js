@@ -339,11 +339,10 @@ function State() {
 ////
 function Game() {
     this.players = [
-        new Player('Me'),
-        // new Player('Karl'),
-        // new Player('Cheryl'),
-        // new Player('Rachel'),
-        // new Player('Jake'),
+        new Player('Karl'),
+        new Player('Cheryl'),
+        new Player('Rachel'),
+        new Player('Jake'),
         ];
     this.state = new State();
 }
@@ -359,12 +358,12 @@ app.get('/catclasses', function (req,res) {
   res.send(JSON.stringify(catClasses, null, 3));
 });
 
-app.get('/players', function (req,res) {
-  res.send(JSON.stringify(game.players, null, 3));
-});
-
 app.get('/state', function (req,res) {
   res.send(JSON.stringify(game.state, null, 3));
+});
+
+app.get('/players', function (req,res) {
+  res.send(JSON.stringify(game.players, null, 3));
 });
 
 app.get('/roll', function (req,res) {
