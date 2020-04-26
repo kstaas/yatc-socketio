@@ -285,68 +285,69 @@ function Straight(player, required_in_a_row) {
     return score;
 }
 
-function Score(player, id) {
-    if (player.state.rounds > 13) {
-        console.error('Score('+id+') trying to score past round 13.');
-        return false;
-    }
+function Score(player, id)
+{
+  if (player.state.rounds > 13) {
+    console.error('Score('+id+') trying to score past round 13.');
+    return false;
+  }
 
-    if (id == -1) {
-        // The category of -1 means score this in the next category that hasn't already been taken.
-        for (var i = 0; i < player.categories.length; ++i) {
-            if (player.categories[i].taken == false) {
-                id = i;
-                break;
-            }
-        }
+  if (id == -1) {
+    // The category of -1 means score this in the next category that hasn't already been taken.
+    for (var i = 0; i < player.categories.length; ++i) {
+      if (player.categories[i].taken == false) {
+        id = i;
+        break;
+      }
     }
-    if (id == -1) {
-        console.error('Score('+id+') trying to score after all the categories have been scored.');
-        return false; // There's nothing left to score.. client should be prevented from hitting score any more.
-    }
+  }
+  if (id == -1) {
+    console.error('Score('+id+') trying to score after all the categories have been scored.');
+    return false; // There's nothing left to score.. client should be prevented from hitting score any more.
+  }
 
-    if (player.categories[id].taken) {
-        console.error('Score('+id+') trying to score in a category that has already been scored in.');
-        return false;
-    }
+  if (player.categories[id].taken) {
+    console.error('Score('+id+') trying to score in a category that has already been scored in.');
+    return false;
+  }
 
-    // console.log('Scoring in category ' + id);
-    switch(id) {
-        case 0: // 1's
-        case 1: // 2's
-        case 2: // 3's
-        case 3: // 4's
-        case 4: // 5's
-        case 5: // 6's
-            player.categories[id].score = CountOccurrencesOfValue(player, id+1);
-            break;
-        case 8: // 3 of kind
-            player.categories[id].score = Count(player, 3);
-            break;
-        case 9: // 4 of kind
-            player.categories[id].score = Count(player, 4);
-            break;
-        case 10: // full house
-            player.categories[id].score = FullHouse(player);
-            break;
-        case 11: // sm straight
-            player.categories[id].score = Straight(player, 4);
-            break;
-        case 12: // lg straight
-            player.categories[id].score = Straight(player, 5);
-            break;
-        case 13: // yatc
-            player.categories[id].score = Count(player, 5);
-            break;
-        case 14: // chance
-            player.categories[id].score = Count(player, 0);
-            break;
-        default:
-            break;
-    }
-    player.categories[id].taken = true;
-    player.score(); // Update totals.
-    return true;
+  // console.log('Scoring in category ' + id);
+  switch(id) {
+      case 0: // 1's
+      case 1: // 2's
+      case 2: // 3's
+      case 3: // 4's
+      case 4: // 5's
+      case 5: // 6's
+          player.categories[id].score = CountOccurrencesOfValue(player, id+1);
+          break;
+      case 8: // 3 of kind
+          player.categories[id].score = Count(player, 3);
+          break;
+      case 9: // 4 of kind
+          player.categories[id].score = Count(player, 4);
+          break;
+      case 10: // full house
+          player.categories[id].score = FullHouse(player);
+          break;
+      case 11: // sm straight
+          player.categories[id].score = Straight(player, 4);
+          break;
+      case 12: // lg straight
+          player.categories[id].score = Straight(player, 5);
+          break;
+      case 13: // yatc
+          player.categories[id].score = Count(player, 5);
+          break;
+      case 14: // chance
+          player.categories[id].score = Count(player, 0);
+          break;
+      default:
+          break;
+  }
+  player.categories[id].taken = true;
+  player.score(); // Update totals.
+  return true;
 }
 
 function Category(id) {
@@ -367,7 +368,7 @@ function Category(id) {
       if (this.id == 6 || this.id == 7 || this.id >= 15) {
         this.taken = true;
       } else {
-        this.taken = true;
+        this.taken = false;
       }
     }
 }
