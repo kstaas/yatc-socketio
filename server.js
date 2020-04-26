@@ -37,6 +37,33 @@ function isNameUnique(name)
   return true;
 }
 
+function findPlayer(name)
+{
+  for (var i = 0; i < game.players.length; ++i)
+  {
+    if (game.players[i].name == name)
+    {
+      return game.players[i];
+    }
+  }
+  return undefined;
+}
+
+// http://stackoverflow.com/questions/22607150/getting-the-url-parameters-inside-the-html-page
+function GetURLParameter(sSearch, sParam, default_value)
+{
+    var sURLVariables = sSearch.substring(1).split('&');
+    for (var i = 0; i < sURLVariables.length; i++)
+    {
+        var sParameterName = sURLVariables[i].split('=');
+        if (sParameterName[0] == sParam)
+        {
+            return sParameterName[1];
+        }
+    }
+    return default_value;
+}
+
 io.on('connection', function(socket) {
   socket.on('chat message', function(name, msg) {
     if (name.length)
@@ -454,9 +481,10 @@ app.get('/roll', function (req,res) {
 
 app.get('/score', function (req,res) {
   var q = url.parse(req.url, true);
-  var scoreString = q.search.substring(1);
+  var name = GetURLParameter(q.search, 'name', '');
+  var scoreString = GetURLParameter(q.search, 'id', '');
   var category = JSON.parse(scoreString.replace(/%22/g, '"'));
-  // console.log('score=' + category);
+  console.log(`name=${name} score=${category}`);
   var ok = Score(category);
   if (ok) {
     // Now, do game maintenance.

@@ -219,7 +219,8 @@ function onRefresh()
 
 function Score(id = -1) { // console.log('Score(' + id + ')');
     // Specifying the category of -1 means score the first available unscored category.
-    httpGetAsync('/score?' + id,
+    var name = $('#n').val();
+    httpGetAsync(`/score?name=${name}&id=${id}`,
             function(response) {
                 // console.log('Score() response=' + response);
                 game = JSON.parse(response); // Server returns whole game on 'score'.
