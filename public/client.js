@@ -27,7 +27,6 @@ function Dice(id) {
 
 function State() {
     this.rounds = 0; // How many rounds have been played?
-    this.player = 0; // What player index is currently rolling?
     this.rolls = 0;  // How many rolls has the current player done?
     this.die = [
         new Dice('dice0'),
@@ -67,7 +66,8 @@ function initialize() {
                         function(response) {
                             catClasses = JSON.parse(response);
 
-                            httpGetAsync('/state',
+                            var name = $('#n').val();
+                            httpGetAsync(`/state?name=${name}`,
                                     function(response) {
                                         state = JSON.parse(response);
 
@@ -155,8 +155,10 @@ function onRollRestart() {
         httpGetAsync('/restart',
                 function(response) {
                     var game = JSON.parse(response); // Server returns whole game on 'score'.
-                    state = game.state;
                     players = game.players;
+                    var name = $('#n').val();
+                    var me = findPlayer(name);
+                    state = me.state;
                     drawBoard();
                 },
                 function(error) {
@@ -178,8 +180,7 @@ function onRollRestart() {
                     // Restore die 'roll' states..
                     for (i = 0; i < state.die.length; ++i) {
                         state.die[i].roll = rolls[i];
-                    }
-                    drawDie();
+                    } drawDie();
                     drawRollRestart();
                 },
                 function(error) {
@@ -202,8 +203,10 @@ function onRefresh()
                     rolls[i] = state.die[i].roll;
                 }
 
-                state = game.state;
                 players = game.players;
+                var name = $('#n').val();
+                var me = findPlayer(name);
+                state = me.state;
 
                 // Restore die 'roll' states..
                 for (i = 0; i < state.die.length; ++i) {
@@ -225,14 +228,26 @@ function Score(id = -1) { // console.log('Score(' + id + ')');
             function(response) {
                 // console.log('Score() response=' + response);
                 game = JSON.parse(response); // Server returns whole game on 'score'.
-                state = game.state;
                 players = game.players;
+                var me = findPlayer(name);
+                state = me.state;
                 drawBoard();
             },
             function(error) {
-                console.error('Score() GET /score status=' + error); });
+                console.error('Score() GET /score status=' + error);
+            });
 }
 
+function findPlayer(name)
+{
+  for (var i = 0; i < players.length; ++i) {
+    if (players[i].name == name) {
+      return players[i];
+    }
+  }
+  return undefined;
+}
+ 
 function drawBoard() {
     // console.log('drawBoard()');
     var columns = 1 + players.length;
@@ -258,9 +273,9 @@ function drawBoard() {
                 score = players[j].categories[i].score;
             }
             var class_score = 'score_idle';
-            if (state.player == j) {
+            // if (state.player == j) {
                 class_score = 'score_roll';
-            }
+            // }
             table += '    <td class=' + class_score + ' align="right">' + score + '</td>'
         }
         table += '  </tr>';

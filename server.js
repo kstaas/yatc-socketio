@@ -195,32 +195,32 @@ var catClasses = [
     "total",
 ];
 
-function CountOccurrencesOfEachValue() {
+function CountOccurrencesOfEachValue(player) {
     var counts = [ 0, 0, 0, 0, 0, 0 ]; // Occurrences of 1s..6s in index 0..5, respectively.
     for (var i = 0; i < 5; ++i) {
-        var value = game.state.die[i].value;
+        var value = player.state.die[i].value;
         counts[value-1]++;
     }
     return counts;
 }
 
-function CountOccurrencesOfValue(value) {
+function CountOccurrencesOfValue(player, value) {
     var score = 0;
     for (var i = 0; i < 5; ++i) {
-        if (game.state.die[i].value == value) {
+        if (player.state.die[i].value == value) {
             score += value;
         }
     }
     return score;
 }
 
-function Count(required) {
+function Count(player, required) {
     // Count how many of each die there is.
     var sum = 0; // just in case we end up scoring this we might as well sum up the dice along the way.
     var scoreit = false;
     var counts = [ 0, 0, 0, 0, 0, 0, 0 ]; // We only use [1] through [6]
     for (var i = 0; i < 5; ++i) {
-        var value = game.state.die[i].value;
+        var value = player.state.die[i].value;
         counts[value]++;
         if (counts[value] >= required) {
             scoreit = true;
@@ -239,11 +239,11 @@ function Count(required) {
     return score;
 }
 
-function FullHouse() {
+function FullHouse(player) {
     var score = 0;
     var have2 = false;
     var have3 = false;
-    var counts = CountOccurrencesOfEachValue();
+    var counts = CountOccurrencesOfEachValue(player);
     for (var i = 0; i < counts.length; ++i) {
         if (counts[i] >= 3 || counts[i] == 5) {
             if (counts[i] == 5) {
@@ -260,9 +260,9 @@ function FullHouse() {
     return score;
 }
 
-function Straight(required_in_a_row) {
+function Straight(player, required_in_a_row) {
     var score = 0;
-    var counts = CountOccurrencesOfEachValue();
+    var counts = CountOccurrencesOfEachValue(player, );
     if (required_in_a_row == 4) {
         if (counts[0] == 5 || counts[1] == 5 || counts[2] == 5 || counts[3] == 5 || counts[4] == 5 || counts[5] == 5) {
             score = 30; // TODO handle yatc bonus.
@@ -285,13 +285,12 @@ function Straight(required_in_a_row) {
     return score;
 }
 
-function Score(id) {
-    if (game.state.rounds > 13) {
+function Score(player, id) {
+    if (player.state.rounds > 13) {
         console.error('Score('+id+') trying to score past round 13.');
         return false;
     }
 
-    var player = game.players[game.state.player];
     if (id == -1) {
         // The category of -1 means score this in the next category that hasn't already been taken.
         for (var i = 0; i < player.categories.length; ++i) {
@@ -319,28 +318,28 @@ function Score(id) {
         case 3: // 4's
         case 4: // 5's
         case 5: // 6's
-            player.categories[id].score = CountOccurrencesOfValue(id+1);
+            player.categories[id].score = CountOccurrencesOfValue(player, id+1);
             break;
         case 8: // 3 of kind
-            player.categories[id].score = Count(3);
+            player.categories[id].score = Count(player, 3);
             break;
         case 9: // 4 of kind
-            player.categories[id].score = Count(4);
+            player.categories[id].score = Count(player, 4);
             break;
         case 10: // full house
-            player.categories[id].score = FullHouse();
+            player.categories[id].score = FullHouse(player);
             break;
         case 11: // sm straight
-            player.categories[id].score = Straight(4);
+            player.categories[id].score = Straight(player, 4);
             break;
         case 12: // lg straight
-            player.categories[id].score = Straight(5);
+            player.categories[id].score = Straight(player, 5);
             break;
         case 13: // yatc
-            player.categories[id].score = Count(5);
+            player.categories[id].score = Count(player, 5);
             break;
         case 14: // chance
-            player.categories[id].score = Count(0);
+            player.categories[id].score = Count(player, 0);
             break;
         default:
             break;
@@ -388,6 +387,7 @@ function Player(name) {
         new Category(16),
         new Category(17),
     ];
+    this.state = new State();
     this.total = 0;
 
     this.score = function() {
@@ -439,7 +439,6 @@ function State() {
 ////
 function Game() {
     this.players = [];
-    this.state = new State();
 }
 
 //// ////
@@ -454,7 +453,14 @@ app.get('/catclasses', function (req,res) {
 });
 
 app.get('/state', function (req,res) {
-  res.send(JSON.stringify(game.state, null, 3));
+  var q = url.parse(req.url, true);
+  var name = GetURLParameter(q.search, 'name', '');
+  var player = findPlayer(name);
+  if (player == undefined) {
+    res.send(JSON.stringify(new State(), null, 3));
+  } else {
+    res.send(JSON.stringify(player.state, null, 3));
+  }
 });
 
 app.get('/players', function (req,res) {
@@ -463,19 +469,20 @@ app.get('/players', function (req,res) {
 
 app.get('/roll', function (req,res) {
   // Protect against the client cheating and trying to roll more than 3 times.
-  if (game.state.rolls < 3) {
-    var q = url.parse(req.url, true);
-    var name = GetURLParameter(q.search, 'name', '');
-    var dieString = GetURLParameter(q.search, 'die', '');
-    var die = JSON.parse(dieString.replace(/%22/g, '"'));
-    console.log(`name=${name} die=${dieString}`);
-    game.state.rolls++;
+  var q = url.parse(req.url, true);
+  var name = GetURLParameter(q.search, 'name', '');
+  var player = findPlayer(name);
+  var dieString = GetURLParameter(q.search, 'die', '');
+  var die = JSON.parse(dieString.replace(/%22/g, '"'));
+  console.log(`name=${name} die=${dieString}`);
+  if (player.state.rolls < 3) {
+    player.state.rolls++;
     for (var i = 0; i < 5; ++i) {
         if (die[i].roll) {
-            game.state.die[i].value = Roll();
+            player.state.die[i].value = Roll();
         }
     }
-    res.send(JSON.stringify(game.state, null, 3));
+    res.send(JSON.stringify(player.state, null, 3));
   } else {
     next(400);
   }
@@ -484,27 +491,24 @@ app.get('/roll', function (req,res) {
 app.get('/score', function (req,res) {
   var q = url.parse(req.url, true);
   var name = GetURLParameter(q.search, 'name', '');
+  var player = findPlayer(name);
   var scoreString = GetURLParameter(q.search, 'id', '');
   var category = JSON.parse(scoreString.replace(/%22/g, '"'));
   console.log(`name=${name} score=${category}`);
-  var ok = Score(category);
+  var ok = Score(player, category);
   if (ok) {
     // Now, do game maintenance.
-    game.state.die = [
+    player.state.die = [
         new Dice(),
         new Dice(),
         new Dice(),
         new Dice(),
         new Dice()
     ];
-    game.state.rolls = 0;
-    game.state.player++;
-    if (game.state.player >= game.players.length) {
-        game.state.player = 0;
-        game.state.rounds++;
-        if (game.state.rounds >= 13) {
-            ; // Game is over.
-        }
+    player.state.rolls = 0;
+    player.state.rounds++;
+    if (player.state.rounds >= 13) {
+        ; // Game is over.
     }
     res.send(JSON.stringify(game, null, 3));
     io.emit('refresh');
