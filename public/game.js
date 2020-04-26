@@ -243,7 +243,7 @@ function drawBoard() {
     table += '</table>';
     ////    table += '</div>';
 
-    document.getElementById('theBoard').innerHTML = table;
+    document.getElementById('board').innerHTML = table;
 
     drawDie();
     drawSelector();

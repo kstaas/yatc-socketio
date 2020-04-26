@@ -1,7 +1,7 @@
 <!doctype html>
 <html>
   <head>
-    <title>Socket.IO chat</title>
+    <title>Socket.IO Dice</title>
     <style>
       * { margin: 0; padding: 0; box-sizing: border-box; }
       body { font: 13px Helvetica, Arial; }
@@ -13,12 +13,23 @@
       #messages li:nth-child(odd) { background: #eee; }
       #messages { margin-bottom: 40px }
     </style>
+    <link rel='stylesheet' href='styles.css'>
   </head>
-  <body>
-    <ul id="messages"></ul>
-    <form action="">
-      <input id="n" size="8"/><input id="m" size="64" autocomplete="off" /><button>Send</button>
-    </form>
+  <body onload='initialize();'>
+    <div>
+        <table id='board'></table>
+        <p>
+        <div id='dice'></die>
+        <p>
+        <input type='button' id='selector' value='' disabled onclick='onSelector()'>
+        <input type='button' id='refresh' value='Refresh' onclick='onRefresh()'>
+    </div>
+    <div>
+        <ul id="messages"></ul>
+        <form action="">
+          <input id="n" size="8"/><input id="m" size="64" autocomplete="off" /><button>Send</button>
+        </form>
+    </div>
     <script src="https://cdn.socket.io/socket.io-1.2.0.js"></script>
     <script src="https://code.jquery.com/jquery-1.11.1.js"></script>
     <script src="chat.js"></script>
