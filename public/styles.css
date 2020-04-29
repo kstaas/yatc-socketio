@@ -32,6 +32,14 @@
         background-color: #66aaaa;
     }
 
+    td.thisplayer {
+        color: #000000;
+    }
+
+    td.thatplayer {
+        color: #cccccc;
+    }
+
     th.turn, td.total {
         color: white;
         background-color: #448888;

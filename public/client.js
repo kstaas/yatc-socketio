@@ -281,7 +281,13 @@ function drawBoard() {
               _class = catClasses[i];
             } else {
               // This is a turn score.
-              _class = '';
+              if (players[j].name == $('#n').val()) {
+                // This is 'this' user.
+                _class = 'thisplayer';
+              } else {
+                // This is some other user.
+                _class = 'thatplayer';
+              }
             }
             table += `    <td class="${_class}" align="right">${score}</td>`;
         }
