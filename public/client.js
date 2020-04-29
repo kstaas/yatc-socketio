@@ -254,7 +254,6 @@ function drawBoard() {
     var columns = 1 + players.length;
 
     var table = '';
-    ////    table += '<div style="overflow-x:auto;">';
     table += '<table>';
 
     // Row 1 - Header.
@@ -295,7 +294,6 @@ function drawBoard() {
     }
 
     table += '</table>';
-    ////    table += '</div>';
 
     document.getElementById('board').innerHTML = table;
 
