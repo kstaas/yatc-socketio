@@ -8,7 +8,6 @@ $(function () {
     return false;
   });
   socket.on('chat message', function(color, name, msg) {
-    mycolor = color;
     $('#messages').append($(`<li style="color:${color}">`).text(`${name}: ${msg}`));
     window.scrollTo(0, document.body.scrollHeight);
   });
@@ -38,7 +37,6 @@ function State() {
     ];
 }
 
-var mycolor = 'black';
 var state = new State();
 var players = [];
 var catNames = [];
@@ -262,15 +260,8 @@ function drawBoard() {
     // Row 1 - Header.
     table += '  <tr>';
     table += '    <th class="turn">Turn</th>';
-    for (var i = 0; i < players.length; ++i)
-    {
-      if (players[i].name == $('#n').val()) {
-        console.log(`its my name so using ${mycolor}`);
-        table += `    <th style="color: white; background-color: ${mycolor};">${players[i].name}</th>`;
-      } else {
-        console.log(`its not my name`);
-        table += '    <th class="player">' + players[i].name + '</th>';
-      }
+    for (var i = 0; i < players.length; ++i) {
+      table += `    <th style="color: white; background-color: ${players[i].color};">${players[i].name}</th>`;
     }
     table += '  </tr>'; 
     // Rows 2-n - Scores and Totals.

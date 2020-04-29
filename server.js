@@ -111,7 +111,7 @@ io.on('connection', function(socket) {
           io.emit('chat message', socket.color, socket.name, 'joined the game');
 
           // Add the player in the context of the game.
-          game.players.push(new Player(socket.name));
+          game.players.push(new Player(socket.name, socket.color));
           // Force a refresh of the client's board.
           io.emit('refresh');
         }
@@ -376,8 +376,9 @@ function Category(id) {
 ////
 ////    require('./player.js');
 ////
-function Player(name) {
+function Player(name, color) {
     this.name = name;
+    this.color = color;
     this.categories = [
         new Category(0),
         new Category(1),
