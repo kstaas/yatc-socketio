@@ -275,11 +275,7 @@ function drawBoard() {
             if (players[j].categories[i].taken == true) {
                 score = players[j].categories[i].score;
             }
-            var class_score = 'score_idle';
-            // if (state.player == j) {
-                class_score = 'score_roll';
-            // }
-            table += '    <td class=' + class_score + ' align="right">' + score + '</td>'
+            table += `    <td align="right">${score}</td>`;
         }
         table += '  </tr>';
     }

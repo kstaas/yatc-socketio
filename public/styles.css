@@ -22,16 +22,6 @@
         background-color: #4CA5F0;
     }
 
-    td.score_roll {
-        color: black;
-        background-color: white;
-    }
-
-    td.score_idle {
-        color: black;
-        background-color: lightgray;
-    }
-
     td.category {
         color: white;
         background-color: #4CAF50;
