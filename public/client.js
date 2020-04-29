@@ -105,7 +105,7 @@ function drawDie() {
         } else {
             src = state.die[i].value + 'k.png';
         }
-        dice += '<img id="dice' + i + '" src="' + src + '" onclick="onDiceClick(' + i + ')"/>';
+        dice += `<img id="dice${i}" src="${src}" height="70px" width="70px" onclick="onDiceClick(${i})"/>`;
     }
     dice += '</div>';
     document.getElementById('dice').innerHTML = dice;
