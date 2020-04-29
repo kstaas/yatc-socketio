@@ -271,11 +271,19 @@ function drawBoard() {
         table += '    <td class="' + catClasses[i] + '">' + catNames[i] + '</td>';
         for (var j = 0; j < players.length; ++j)
         {
-            var score = '';
+            let score = '';
             if (players[j].categories[i].taken == true) {
                 score = players[j].categories[i].score;
             }
-            table += `    <td align="right">${score}</td>`;
+            let _class = '';
+            if (i == 6 || i == 7 || i >= 15) {
+              // This is a total score.
+              _class = catClasses[i];
+            } else {
+              // This is a turn score.
+              _class = '';
+            }
+            table += `    <td class="${_class}" align="right">${score}</td>`;
         }
         table += '  </tr>';
     }
