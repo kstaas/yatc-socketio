@@ -8,6 +8,7 @@ $(function () {
     return false;
   });
   socket.on('chat message', function(color, name, msg) {
+    mycolor = color;
     $('#messages').append($(`<li style="color:${color}">`).text(`${name}: ${msg}`));
     window.scrollTo(0, document.body.scrollHeight);
   });
@@ -37,6 +38,7 @@ function State() {
     ];
 }
 
+var mycolor = 'black';
 var state = new State();
 var players = [];
 var catNames = [];
@@ -192,7 +194,7 @@ function onRollRestart() {
 
 function onRefresh()
 {
-    console.log('onRefresh()');
+    // console.log('onRefresh()');
     httpGetAsync('/refresh',
             function(response) {
                 var game = JSON.parse(response); // Server returns whole game on 'refresh'.
@@ -260,15 +262,24 @@ function drawBoard() {
     // Row 1 - Header.
     table += '  <tr>';
     table += '    <th class="turn">Turn</th>';
-    for (var i = 0; i < players.length; ++i) {
+    for (var i = 0; i < players.length; ++i)
+    {
+      if (players[i].name == $('#n').val()) {
+        console.log(`its my name so using ${mycolor}`);
+        table += `    <th style="color: white; background-color: ${mycolor};">${players[i].name}</th>`;
+      } else {
+        console.log(`its not my name`);
         table += '    <th class="player">' + players[i].name + '</th>';
+      }
     }
     table += '  </tr>'; 
     // Rows 2-n - Scores and Totals.
-    for (var i = 0; i < catNames.length; ++i) {
+    for (var i = 0; i < catNames.length; ++i)
+    {
         table += '  <tr id="cat' + i + '" onclick="onCategory(' + i + ')">';
         table += '    <td class="' + catClasses[i] + '">' + catNames[i] + '</td>';
-        for (var j = 0; j < players.length; ++j) {
+        for (var j = 0; j < players.length; ++j)
+        {
             var score = '';
             if (players[j].categories[i].taken == true) {
                 score = players[j].categories[i].score;
