@@ -9,6 +9,7 @@ var http = require('http').Server(app);
 var url = require('url');
 var io = require('socket.io')(http);
 var port = process.env.PORT || 3000;
+var name2socket = {};
 
 app.use(express.static('public'));
 
@@ -111,6 +112,7 @@ io.on('connection', function(socket) {
           io.emit('chat message', socket.color, socket.name, 'joined the game');
 
           // Add the player in the context of the game.
+          name2socket[name] = socket;
           game.players.push(new Player(socket.name, socket.color));
           // Force a refresh of the client's board.
           io.emit('refresh');
@@ -525,7 +527,9 @@ app.get('/score', function (req,res) {
     player.state.rolls = 0;
     player.state.rounds++;
     if (player.state.rounds >= 13) {
-        ; // Game is over.
+        // Game is over.
+        let socket = name2socket[name];
+        io.emit('chat message', socket.color, socket.name, player.categories[17].score);
     }
     res.send(JSON.stringify(game, null, 3));
     io.emit('refresh');
