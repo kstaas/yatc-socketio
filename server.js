@@ -127,6 +127,9 @@ io.on('connection', function(socket) {
           {
             if (game.players[i].name == socket.name)
             {
+              // Remove old map entry and insert new.
+              delete name2socket[socket.name];
+              name2socket[name] = socket;
               game.players[i].name = name;
               // Force a refresh of the all of the client boards.
               io.emit('refresh');
@@ -145,6 +148,25 @@ io.on('connection', function(socket) {
         }
       }
     }
+  });
+
+  socket.on('disconnect', () => {
+    // Remove old map entry and insert new.
+    delete name2socket[socket.name];
+
+    // Remove the player.
+    for (let i = 0; i < game.players.length; ++i) {
+      if (game.players[i].name == socket.name) {
+        game.players.splice(i,1);
+        break;
+      }
+    }
+
+    // Announce in chat that this player has left.
+    io.emit('chat message', 'black', socket.name, 'left the game');
+
+    // Force a refresh of the all of the client boards.
+    io.emit('refresh');
   });
 });
 
