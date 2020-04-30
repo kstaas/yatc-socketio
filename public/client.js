@@ -140,12 +140,16 @@ function onDiceClick(index) {
 }
 
 function onCategory(cat=-1) {
-    // console.log('onCategory(' + cat + ')');
+  // console.log('onCategory(' + cat + ')');
+  // Only score if the die are active, which we detect by cheating and peeking at the first one.
+  if (state.die[0].value != 0)
+  {
     if (cat == 0 || cat == 1 || cat == 2 || cat ==3 || cat == 4 || cat == 5) {
-        Score(cat);
+      Score(cat);
     } else if (cat == 8 || cat == 9 || cat == 10 || cat == 11 || cat == 12 || cat == 13 || cat == 14) {
-        Score(cat);
+      Score(cat);
     }
+  }
 }
 
 function onRollRestart() {
