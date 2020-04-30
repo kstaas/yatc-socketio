@@ -264,7 +264,7 @@ function drawBoard() {
     table += '  <tr>';
     table += '    <th class="turn">Turn</th>';
     for (var i = 0; i < players.length; ++i) {
-      table += `    <th style="color: white; background-color: ${players[i].color};">${players[i].name}</th>`;
+      table += `    <th style="color: white; background-color: ${players[i].color}; width: 65px;">${players[i].name}</th>`;
     }
     table += '  </tr>'; 
     // Rows 2-n - Scores and Totals.
