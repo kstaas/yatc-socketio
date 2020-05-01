@@ -264,32 +264,42 @@ function Count(player, required) {
 }
 
 function FullHouse(player) {
-    var score = 0;
-    var have2 = false;
-    var have3 = false;
-    var counts = CountOccurrencesOfEachValue(player);
+  var score = 0;
+  var have2 = false;
+  var have3 = false;
+  var counts = CountOccurrencesOfEachValue(player);
+  if (counts[0] == 5 || counts[1] == 5 || counts[2] == 5 || counts[3] == 5 || counts[4] == 5 || counts[5] == 5) {
+    have2 = true;
+    have3 = true;
+  } else {
     for (var i = 0; i < counts.length; ++i) {
-        if (counts[i] >= 3 || counts[i] == 5) {
-            if (counts[i] == 5) {
-                ; // TODO handle yatc bonus.
-            }
+        if (counts[i] >= 3) {
             have3 = true;
         } else if (counts[i] >= 2) {
             have2 = true;
         }
     }
-    if (have2 && have3) {
-        score = 25;
-    }
-    return score;
+  }
+  if (have2 && have3) {
+      score = 25;
+  }
+  return score;
+}
+
+function AllSameValue(counts) {
+  if (counts[0] == 5 || counts[1] == 5 || counts[2] == 5 || counts[3] == 5 || counts[4] == 5 || counts[5] == 5) {
+    return true;
+  } else {
+    return false;
+  }
 }
 
 function Straight(player, required_in_a_row) {
     var score = 0;
-    var counts = CountOccurrencesOfEachValue(player, );
+    var counts = CountOccurrencesOfEachValue(player);
     if (required_in_a_row == 4) {
         if (counts[0] == 5 || counts[1] == 5 || counts[2] == 5 || counts[3] == 5 || counts[4] == 5 || counts[5] == 5) {
-            score = 30; // TODO handle yatc bonus.
+            score = 30; // handle yatc bonus later.
         } else if (counts[0] && counts[1] && counts[2] && counts[3]) {
             score = 30;
         } else if (counts[1] && counts[2] && counts[3] && counts[4]) {
@@ -299,7 +309,7 @@ function Straight(player, required_in_a_row) {
         }
     } else if (required_in_a_row == 5) {
         if (counts[0] == 5 || counts[1] == 5 || counts[2] == 5 || counts[3] == 5 || counts[4] == 5 || counts[5] == 5) {
-            score = 40; // TODO handle yatc bonus.
+            score = 40; // handle yatc bonus later.
         } else if (counts[0] && counts[1] && counts[2] && counts[3] && counts[4]) {
             score = 40;
         } else if (counts[1] && counts[2] && counts[3] && counts[4] && counts[5]) {
@@ -368,6 +378,16 @@ function Score(player, id)
           break;
       default:
           break;
+  }
+  // If we're not scoring a yahtzee *and* a yahtzee has already been scored then add a yahtzee bonus.
+  // To get a yahtzee bonus you must meet:
+  //  1. You're not getting a yahtzee in this roll.
+  //  2. You already have one yahtzee.
+  //  3. You must have scored non-0 in the category you just took.
+  //  4. You must have another yahtzee.
+  let counts = CountOccurrencesOfEachValue(player);
+  if (id != 13 && player.categories[13].score == 50 && player.categories[id].score != 0 && AllSameValue(counts)) {
+    player.categories[15].score += 100;
   }
   player.categories[id].taken = true;
   player.score(); // Update totals.
@@ -442,7 +462,7 @@ function Player(name, color) {
         for (var i = 8; i < 15; ++i) {
             bottotal += this.categories[i].score;
         }
-        this.categories[15].score = 0; // TODO yatc bonus
+        //this.categories[15].score
         this.categories[16].score = this.categories[15].score + bottotal;
         this.categories[17].score = this.categories[7].score + this.categories[16].score;
     }
