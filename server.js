@@ -140,7 +140,7 @@ io.on('connection', function(socket) {
           }
 
           // Announce in chat the name change.
-          io.emit('chat message', now, 'black', socket.name, `changed name to ${name}`)
+          io.emit('chat message', now, socket.color, socket.name, `changed name to ${name}`)
           socket.name = name;
         }
 
@@ -153,23 +153,26 @@ io.on('connection', function(socket) {
   });
 
   socket.on('disconnect', () => {
-    let now = new Date().getTime();
+    // Only act if there's a socket.name.
+    if (typeof(socket.name) !== "undefined")
+    {
+      let now = new Date().getTime();
+      let name = socket.name;
+      let color = socket.color;
 
-    // Remove old map entry and insert new.
-    delete name2socket[socket.name];
+      // Remove old map entry and insert new.
+      delete name2socket[socket.name];
 
-    // Remove the player.
-    for (let i = 0; i < game.players.length; ++i) {
-      if (game.players[i].name == socket.name) {
-        game.players.splice(i,1);
-        break;
+      // Remove the player.
+      for (let i = 0; i < game.players.length; ++i) {
+        if (game.players[i].name == socket.name) {
+          game.players.splice(i,1);
+          break;
+        }
       }
-    }
 
-    // Announce in chat that this player has left.
-    // TODO Figure out how the 'null: left the game' messages were coming through and this if had to be inserted.
-    if (socket != undefined && socket.name != undefined) {
-      io.emit('chat message', now, 'black', socket.name, 'left the game');
+      // Announce in chat that this player has left.
+      io.emit('chat message', now, color, name, 'left the game');
 
       // Force a refresh of the all of the client boards.
       io.emit('refresh');
