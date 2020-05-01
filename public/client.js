@@ -15,13 +15,11 @@ $(function () {
   socket.on('chat message', function(now, color, name, msg) {
     let nowObject = new Date();
     nowObject.setTime(now);
-    $('#messages').append($(`<li style="color:${color}">`).text(`${nowObject.toLocaleString()} : ${name} : ${msg}`));
-    window.scrollTo(0, document.body.scrollHeight);
+    $('#messages').prepend($(`<li style="color:${color}">`).text(`${nowObject.toLocaleString()} : ${name} : ${msg}`));
   });
 
   socket.on('help', function (help) {
-    $('#messages').append($(`<li style="color:black">${help}`));
-    window.scrollTo(0, document.body.scrollHeight);
+    $('#messages').prepend($(`<li style="color:black">${help}`));
   });
 
   socket.on('name failed', function() {
