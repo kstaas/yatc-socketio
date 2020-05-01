@@ -17,4 +17,4 @@
 * Track high-scores.
 * Show how far the player is from getting the top bonus.
 * Show what the player's score would be for unscored categories.
-
+* Fix chat output so it doesn't scroll the game off the screen.
