@@ -189,8 +189,7 @@ io.on('connection', function(socket) {
         } else {
           html = markdown.toHTML(data);
         }
-        let now = new Date().getTime();
-        socket.emit('chat message', now, 'black', 'system', html);
+        socket.emit('help', html);
     });
   });
 });

@@ -19,6 +19,11 @@ $(function () {
     window.scrollTo(0, document.body.scrollHeight);
   });
 
+  socket.on('help', function (help) {
+    $('#messages').append($(`<li style="color:black">${help}`));
+    window.scrollTo(0, document.body.scrollHeight);
+  });
+
   socket.on('name failed', function() {
     $('#n').val('');
   });
