@@ -7,8 +7,10 @@ $(function () {
     $('#m').val('');
     return false;
   });
-  socket.on('chat message', function(color, name, msg) {
-    $('#messages').append($(`<li style="color:${color}">`).text(`${name}: ${msg}`));
+  socket.on('chat message', function(now, color, name, msg) {
+    let nowObject = new Date();
+    nowObject.setTime(now);
+    $('#messages').append($(`<li style="color:${color}">`).text(`${nowObject.toLocaleString()} : ${name} : ${msg}`));
     window.scrollTo(0, document.body.scrollHeight);
   });
   socket.on('name failed', function() {

@@ -71,11 +71,13 @@ io.on('connection', function(socket) {
     {
       // Only do something if a name was specified.
 
+      let now = new Date().getTime();
+
       if (socket.name == name)
       {
         // This is an existing user so emit their message if there is one.
         if (msg.length) {
-          io.emit('chat message', socket.color, socket.name, msg);
+          io.emit('chat message', now, socket.color, socket.name, msg);
         }
       }
       else if (!isNameUnique(name))
@@ -85,16 +87,16 @@ io.on('connection', function(socket) {
         if (socket.name == undefined)
         {
           // A new player tried to use a name that was already in use.
-          io.emit('chat message', 'black', 'system', `failed to add player with name ${name}`);
+          io.emit('chat message', now, 'black', 'system', `failed to add player with name ${name}`);
           socket.emit('name failed'); // This will 'clear' the name from the name field at the client.
           if (msg.length) {
-            io.emit('chat message', 'black', 'system', msg);
+            io.emit('chat message', now, 'black', 'system', msg);
           }
         }
         else
         {
           // An existing player tried to rename to a name that was already in use.
-          io.emit('chat message', socket.color, socket.name, `failed to change name to ${name}`);
+          io.emit('chat message', now, socket.color, socket.name, `failed to change name to ${name}`);
         }
       }
       else
@@ -109,7 +111,7 @@ io.on('connection', function(socket) {
           socket.name = name;
           socket.color = colors[cindex];
           cindex = (cindex + 1) % colors.length;
-          io.emit('chat message', socket.color, socket.name, 'joined the game');
+          io.emit('chat message', now, socket.color, socket.name, 'joined the game');
 
           // Add the player in the context of the game.
           name2socket[name] = socket;
@@ -138,19 +140,21 @@ io.on('connection', function(socket) {
           }
 
           // Announce in chat the name change.
-          io.emit('chat message', 'black', socket.name, `changed name to ${name}`)
+          io.emit('chat message', now, 'black', socket.name, `changed name to ${name}`)
           socket.name = name;
         }
 
         // Handle any msg, whether its a new player or an existing player.
         if (msg.length) {
-          io.emit('chat message', socket.color, socket.name, msg);
+          io.emit('chat message', now, socket.color, socket.name, msg);
         }
       }
     }
   });
 
   socket.on('disconnect', () => {
+    let now = new Date().getTime();
+
     // Remove old map entry and insert new.
     delete name2socket[socket.name];
 
@@ -163,10 +167,13 @@ io.on('connection', function(socket) {
     }
 
     // Announce in chat that this player has left.
-    io.emit('chat message', 'black', socket.name, 'left the game');
+    // TODO Figure out how the 'null: left the game' messages were coming through and this if had to be inserted.
+    if (socket != undefined && socket.name != undefined) {
+      io.emit('chat message', now, 'black', socket.name, 'left the game');
 
-    // Force a refresh of the all of the client boards.
-    io.emit('refresh');
+      // Force a refresh of the all of the client boards.
+      io.emit('refresh');
+    }
   });
 });
 
@@ -550,6 +557,7 @@ app.get('/roll', function (req,res) {
 });
 
 app.get('/score', function (req,res) {
+  let now = new Date().getTime();
   var q = url.parse(req.url, true);
   var name = GetURLParameter(q.search, 'name', '');
   var player = findPlayer(name);
@@ -571,7 +579,7 @@ app.get('/score', function (req,res) {
     if (player.state.rounds >= 13) {
         // Game is over.
         let socket = name2socket[name];
-        io.emit('chat message', socket.color, socket.name, player.categories[17].score);
+        io.emit('chat message', now, socket.color, socket.name, player.categories[17].score);
     }
     res.send(JSON.stringify(game, null, 3));
     io.emit('refresh');
