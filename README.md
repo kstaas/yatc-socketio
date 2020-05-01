@@ -17,4 +17,5 @@
 * Track high-scores.
 * Show how far the player is from getting the top bonus.
 * Show what the player's score would be for unscored categories.
+* Timestamp player chat events (use server time so all player data is correlated).
 
