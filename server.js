@@ -9,6 +9,8 @@ var http = require('http').Server(app);
 var url = require('url');
 var io = require('socket.io')(http);
 var port = process.env.PORT || 3000;
+var fs = require('fs');
+var markdown = require('markdown').markdown;
 var name2socket = {};
 
 app.use(express.static('public'));
@@ -177,6 +179,19 @@ io.on('connection', function(socket) {
       // Force a refresh of the all of the client boards.
       io.emit('refresh');
     }
+  });
+
+  socket.on('help', () => {
+    fs.readFile('README.md', 'utf8', function(err, data) {
+        let html = '';
+        if (err) {
+          html = `Error ${err} reading help file`;
+        } else {
+          html = markdown.toHTML(data);
+        }
+        let now = new Date().getTime();
+        socket.emit('chat message', now, 'black', 'system', html);
+    });
   });
 });
 

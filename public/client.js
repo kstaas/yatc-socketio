@@ -7,17 +7,24 @@ $(function () {
     $('#m').val('');
     return false;
   });
+
+  $('#help').click(function() {
+    socket.emit('help');
+  });
+
   socket.on('chat message', function(now, color, name, msg) {
     let nowObject = new Date();
     nowObject.setTime(now);
     $('#messages').append($(`<li style="color:${color}">`).text(`${nowObject.toLocaleString()} : ${name} : ${msg}`));
     window.scrollTo(0, document.body.scrollHeight);
   });
+
   socket.on('name failed', function() {
     $('#n').val('');
   });
+
   socket.on('refresh', function() {
-    onRefresh();
+    Refresh();
   });
 });
 
@@ -196,9 +203,9 @@ function onRollRestart() {
     }
 }
 
-function onRefresh()
+function Refresh()
 {
-    // console.log('onRefresh()');
+    // console.log('Refresh()');
     httpGetAsync('/refresh',
             function(response) {
                 var game = JSON.parse(response); // Server returns whole game on 'refresh'.
@@ -224,7 +231,7 @@ function onRefresh()
                 drawBoard();
             },
             function(error) {
-                console.error('onRollRestart() GET /refresh status=' + error);
+                console.error('Refresh() GET /refresh status=' + error);
             });
 }
 
