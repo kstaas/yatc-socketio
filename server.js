@@ -407,10 +407,9 @@ function Score(player, id)
   // To get a yahtzee bonus you must meet:
   //  1. You're not getting a yahtzee in this roll.
   //  2. You already have one yahtzee.
-  //  3. You must have scored non-0 in the category you just took.
-  //  4. You must have another yahtzee.
+  //  3. You must have another yahtzee.
   let counts = CountOccurrencesOfEachValue(player);
-  if (id != 13 && player.categories[13].score == 50 && player.categories[id].score != 0 && AllSameValue(counts)) {
+  if (id != 13 && player.categories[13].score == 50 && AllSameValue(counts)) {
     player.categories[15].score += 100;
   }
   player.categories[id].taken = true;
