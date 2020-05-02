@@ -15,6 +15,5 @@
 * Allow player to remove themselves from the game while still connected.
 * Leave disconnected players in the game so they can be 'reconnected' to (but omit them from the visual player list).
 * Track high-scores.
-* Show how far the player is from getting the top bonus.
 * Show what the player's score would be for unscored categories.
 * Fix chat output so it doesn't scroll the game off the screen.

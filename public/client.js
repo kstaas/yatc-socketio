@@ -255,6 +255,16 @@ function Score(id = -1) { // console.log('Score(' + id + ')');
             });
 }
 
+function TopAllTaken(player)
+{
+  for (let i = 0; i < 6; ++i) {
+    if (!player.categories[i].taken) {
+      return false;
+    }
+  }
+  return true;
+}
+
 function findPlayer(name)
 {
   for (var i = 0; i < players.length; ++i) {
@@ -291,10 +301,30 @@ function drawBoard() {
                 score = players[j].categories[i].score;
             }
             let _class = '';
-            if (i == 6 || i == 7 || i >= 15) {
+            if (i == 6)
+            {
+              // This is the top bonus which we treat a little special.
+              // If the top is completely scored (i.e. taken) then show the bonus value.
+              // But, if the top is not completely scored show the +/- fron the bonus.
+              if (TopAllTaken(players[j]))
+              {
+                _class = catClasses[i];
+              } else {
+                score = players[j].categories[7].score - 63;
+                if (score >= 0) {
+                  _class = 'bonus_pos';
+                } else {
+                  _class = 'bonus_neg';
+                }
+              }
+            }
+            else if (i == 7 || i >= 15)
+            {
               // This is a total score.
               _class = catClasses[i];
-            } else {
+            }
+            else
+            {
               // This is a turn score.
               if (players[j].name == $('#n').val()) {
                 // This is 'this' user.

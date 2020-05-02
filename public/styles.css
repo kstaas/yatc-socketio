@@ -32,6 +32,16 @@
         background-color: #66aaaa;
     }
 
+    td.bonus_pos {
+        color: green;
+        background-color: #66aaaa;
+    }
+
+    td.bonus_neg {
+        color: red;
+        background-color: #66aaaa;
+    }
+
     td.thisplayer {
         color: #000000;
     }
