@@ -304,13 +304,18 @@ function drawBoard() {
             if (i == 6)
             {
               // This is the top bonus which we treat a little special.
-              // If the top is completely scored (i.e. taken) then show the bonus value.
-              // But, if the top is not completely scored show the +/- fron the bonus.
               if (TopAllTaken(players[j]))
               {
+                // All the top categories have been scored so put in the actual value of the bonus, 0 or 35.
                 _class = catClasses[i];
               } else {
-                score = players[j].categories[7].score - 63;
+                // There are unscored top categories so, for those top categories scored, put in the offset from 'standard' 3x.
+                score = 0;
+                for (let k = 0; k < 6; ++k) {
+                  if (players[j].categories[k].taken) {
+                    score += (players[j].categories[k].score - ((k+1)*3));
+                  }
+                }
                 if (score >= 0) {
                   _class = 'bonus_pos';
                 } else {
