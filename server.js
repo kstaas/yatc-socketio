@@ -27,31 +27,6 @@ http.listen(port, function() {
 var cindex = 0;
 var colors = [ 'red', 'blue', 'green', 'orange', 'cyan', 'pink', 'purple' ];
 
-function isNameUnique(name)
-{
-  var unique = true;
-  for (var i = 0; i < game.players.length; ++i)
-  {
-    if (game.players[i].name == name)
-    {
-      return false;
-    }
-  }
-  return true;
-}
-
-function findPlayer(name)
-{
-  for (var i = 0; i < game.players.length; ++i)
-  {
-    if (game.players[i].name == name)
-    {
-      return game.players[i];
-    }
-  }
-  return undefined;
-}
-
 // http://stackoverflow.com/questions/22607150/getting-the-url-parameters-inside-the-html-page
 function GetURLParameter(sSearch, sParam, default_value)
 {
@@ -82,7 +57,7 @@ io.on('connection', function(socket) {
           io.emit('chat message', now, socket.color, socket.name, msg);
         }
       }
-      else if (!isNameUnique(name))
+      else if (!game.IsNameUnique(name))
       {
         // The specified name was not unique.
 
@@ -509,7 +484,6 @@ function Dice() {
 
 function State() {
     this.rounds = 0; // How many rounds have been played?
-    this.player = 0; // What player index is currently rolling?
     this.rolls = 0;  // How many rolls has the current player done?
     this.die = [
         new Dice(),
@@ -523,8 +497,32 @@ function State() {
 ////
 ////    require('./game.js');
 ////
-function Game() {
+function Game()
+{
     this.players = [];
+    this.FindPlayer = function(name)
+    {
+      for (var i = 0; i < this.players.length; ++i)
+      {
+        if (this.players[i].name == name)
+        {
+          return this.players[i];
+        }
+      }
+      return undefined;
+    }
+    this.IsNameUnique = function(name)
+    {
+      var unique = true;
+      for (var i = 0; i < this.players.length; ++i)
+      {
+        if (this.players[i].name == name)
+        {
+          return false;
+        }
+      }
+      return true;
+    }
 }
 
 //// ////
@@ -541,7 +539,7 @@ app.get('/catclasses', function (req,res) {
 app.get('/state', function (req,res) {
   var q = url.parse(req.url, true);
   var name = GetURLParameter(q.search, 'name', '');
-  var player = findPlayer(name);
+  var player = game.FindPlayer(name);
   if (player == undefined) {
     res.send(JSON.stringify(new State(), null, 3));
   } else {
@@ -557,7 +555,7 @@ app.get('/roll', function (req,res) {
   // Protect against the client cheating and trying to roll more than 3 times.
   var q = url.parse(req.url, true);
   var name = GetURLParameter(q.search, 'name', '');
-  var player = findPlayer(name);
+  var player = game.FindPlayer(name);
   var dieString = GetURLParameter(q.search, 'die', '');
   var die = JSON.parse(dieString.replace(/%22/g, '"'));
   // console.log(`name=${name} die=${dieString}`);
@@ -576,7 +574,7 @@ app.get('/score', function (req,res) {
   let now = new Date().getTime();
   var q = url.parse(req.url, true);
   var name = GetURLParameter(q.search, 'name', '');
-  var player = findPlayer(name);
+  var player = game.FindPlayer(name);
   var scoreString = GetURLParameter(q.search, 'id', '');
   var category = JSON.parse(scoreString.replace(/%22/g, '"'));
   // console.log(`name=${name} score=${category}`);
@@ -609,7 +607,12 @@ app.get('/refresh', function (req,res) {
 app.get('/restart', function (req,res) {
   var q = url.parse(req.url, true);
   var name = GetURLParameter(q.search, 'name', '');
-  var player = findPlayer(name);
+  var player = game.FindPlayer(name);
   player.reset();
+  // Just like the player did the first roll.
+  player.state.rolls++;
+  for (var i = 0; i < 5; ++i) {
+    player.state.die[i].value = Roll();
+  }
   res.send(JSON.stringify(game, null, 3));
 });

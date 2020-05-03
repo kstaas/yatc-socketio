@@ -171,7 +171,7 @@ function onRollRestart() {
         var name = $('#n').val();
         httpGetAsync(`/restart?name=${name}`,
                 function(response) {
-                    var game = JSON.parse(response); // Server returns whole game on 'score'.
+                    var game = JSON.parse(response);
                     players = game.players;
                     var name = $('#n').val();
                     var me = findPlayer(name);
@@ -197,7 +197,8 @@ function onRollRestart() {
                     // Restore die 'roll' states..
                     for (i = 0; i < state.die.length; ++i) {
                         state.die[i].roll = rolls[i];
-                    } drawDie();
+                    }
+                    drawDie();
                     drawRollRestart();
                 },
                 function(error) {
@@ -211,7 +212,9 @@ function Refresh()
     // console.log('Refresh()');
     httpGetAsync('/refresh',
             function(response) {
-                var game = JSON.parse(response); // Server returns whole game on 'refresh'.
+                // Server returns whole game on 'refresh'.
+                // TODO See about returning just this player's state.
+                var game = JSON.parse(response);
 
                 // Save old die 'roll' states..
                 var i;
@@ -275,7 +278,8 @@ function findPlayer(name)
   return undefined;
 }
  
-function drawBoard() {
+function drawBoard()
+{
     // console.log('drawBoard()');
     var columns = 1 + players.length;
 
