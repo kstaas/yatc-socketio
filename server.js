@@ -88,6 +88,7 @@ io.on('connection', function(socket) {
           socket.name = name;
           socket.color = colors[cindex];
           cindex = (cindex + 1) % colors.length;
+          console.log(`${socket.name} joined the game`);
           io.emit('chat message', now, socket.color, socket.name, 'joined the game');
 
           // Add the player in the context of the game.
@@ -117,6 +118,7 @@ io.on('connection', function(socket) {
           }
 
           // Announce in chat the name change.
+          console.log(`${socket.name} changed name to ${name}`);
           io.emit('chat message', now, socket.color, socket.name, `changed name to ${name}`)
           socket.name = name;
         }
@@ -149,6 +151,7 @@ io.on('connection', function(socket) {
       }
 
       // Announce in chat that this player has left.
+      console.log(`${name} left the game`);
       io.emit('chat message', now, color, name, 'left the game');
 
       // Force a refresh of the all of the client boards.
