@@ -88,7 +88,7 @@ io.on('connection', function(socket) {
           socket.name = name;
           socket.color = colors[cindex];
           cindex = (cindex + 1) % colors.length;
-          console.log(`${socket.name} joined`);
+          console.log(`${DateTimeString(now)} ${socket.name} joined`);
           io.emit('chat message', now, socket.color, socket.name, 'joined');
 
           // Add the player in the context of the game.
@@ -118,7 +118,7 @@ io.on('connection', function(socket) {
           }
 
           // Announce in chat the name change.
-          console.log(`${socket.name} changed name to ${name}`);
+          console.log(`${DateTimeString(now)} ${socket.name} changed name to ${name}`);
           io.emit('chat message', now, socket.color, socket.name, `changed name to ${name}`)
           socket.name = name;
         }
@@ -151,7 +151,7 @@ io.on('connection', function(socket) {
       }
 
       // Announce in chat that this player has left.
-      console.log(`${name} left`);
+      console.log(`${DateTimeString(now)} ${name} left`);
       io.emit('chat message', now, color, name, 'left');
 
       // Force a refresh of the all of the client boards.
@@ -175,6 +175,27 @@ io.on('connection', function(socket) {
 //
 // game
 //
+
+function padl(s, l, c)
+{
+  while (s.length < l)
+  {
+    s = c + s;
+  }
+  return s;
+}
+
+function DateTimeString(time)
+{
+  let d = new Date(time);
+  let yr = padl(d.getFullYear().toString(10), 4, '0');
+  let mo = padl((d.getMonth()+1).toString(10), 2, '0');
+  let da = padl(d.getDate().toString(10), 2, '0');
+  let hr = padl(d.getHours().toString(10), 2, '0');
+  let mi = padl(d.getMinutes().toString(10), 2, '0');
+  let se = padl(d.getSeconds().toString(10), 2, '0');
+  return `${yr}-${mo}-${da} ${hr}:${mi}:${se}`;
+}
 
 ////
 ////    require('./category.js');
