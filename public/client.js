@@ -112,11 +112,13 @@ function drawDie() {
     dice += '<div>';
     for (var i = 0; i < 5; ++i) {
         var src = '';
-        if (state.die[i].roll || !state.die[i].value) {
-            src = state.die[i].value + '.png';
+	if (0 == state.die[i].value) {
+            src = 'blank.png';
+	} else if (state.die[i].roll) {
+            src = state.die[i].value + '-roll.png';
         } else {
-            src = state.die[i].value + 'k.png';
-        }
+            src = state.die[i].value + '-keep.png';
+	}
         dice += `<img id="dice${i}" src="${src}" height="70px" width="70px" onclick="onDiceClick(${i})"/>`;
     }
     dice += '</div>';

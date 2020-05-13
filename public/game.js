@@ -80,9 +80,9 @@ function drawDie() {
     for (var i = 0; i < 5; ++i) {
         var src = '';
         if (state.die[i].roll || !state.die[i].value) {
-            src = state.die[i].value + '.png';
+            src = state.die[i].value + '-roll.png';
         } else {
-            src = state.die[i].value + 'k.png';
+            src = state.die[i].value + '-keep.png';
         }
         dice += '<img id="dice' + i + '" src="' + src + '" onclick="onDiceClick(' + i + ')"/>';
     }
